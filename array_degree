@@ -1,0 +1,43 @@
+class Solution {
+public:
+    int findShortestSubArray(vector<int>& nums) {
+        // 每一个元素都有一个pair<left, right>
+        for (int i = 0; i < nums.size(); i++) {
+            if (h1.find(nums[i]) == h1.end()) {
+                h1[nums[i]] = new ContextNode(i);
+            } else {
+                ContextNode* tmp = h1[nums[i]];
+                tmp->right = i; 
+                tmp->degree += 1;
+                h1[nums[i]] = tmp;
+            }
+        }
+        int maxKey = nums[0];   // key
+        ContextNode* t = h1[maxKey];
+        int degree = t->degree; // 度
+        int length = t->right-t->left+1;
+
+        auto it = h1.begin();
+        for (; it != h1.end(); it++) {
+            ContextNode* tmp = it->second;
+            int tmpLength = tmp->right-tmp->left+1;
+            if (tmp->degree > degree || (tmp->degree == degree && tmpLength < length)) {
+                maxKey = it->first;
+                degree = tmp->degree;
+                length = tmpLength;
+            }
+        }
+
+        return length;
+    }
+
+private:
+    struct ContextNode {
+        int left;
+        int right;
+        int degree;
+        ContextNode(int val) : left(val), right(val), degree(1) {}
+    };
+    unordered_map<int, ContextNode*> h1;
+    unordered_map<int, int> h2;
+};
